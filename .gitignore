@@ -4,3 +4,4 @@ logs/*
 wheelhouse/*
 data/*
 *.iml
+passport/static/components/*
