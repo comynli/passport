@@ -1,0 +1,31 @@
+<div ng-include="'template/menu.html'"></div>
+<div class="ui floated grid">
+    <div class="two wide column">
+        <div class="ui white segment">
+            <div class="ui image">
+                <img ng-src="/qr/{{ user.name }}-{{ user.secret }}.svg">
+            </div>
+            <h2 class="ui header">{{ user.name }}</h2>
+            <h3 class="ui header">{{ user.primary_group.name }}</h3>
+            <div class="divided"></div>
+            <div class="ui list">
+                <div class="item" ng-repeat="group in user.groups">
+                    <i class="group icon"></i>
+                    <div class="content">{{ group.name }}</div>
+                </div>
+                <div class="item" ng-repeat="mail in user.mail">
+                    <i class="mail icon"></i>
+                    <div class="content">{{ mail }}</div>
+                </div>
+                <div class="item" ng-repeat="phone in user.phone">
+                    <i class="mobile icon"></i>
+                    <div class="content">{{ phone }}</div>
+                </div>
+                <div class="item" ng-repeat="role in user.roles">
+                    <i class="sitemap icon"></i>
+                    <div class="content">{{ role }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
