@@ -74,7 +74,8 @@ class LoginHandler(BaseHandler):
                 self.cache.set('%s::token::%s' % (self.config('/passport/cache/prefix'), token), user.name)
                 self.cache.delete('%s::try::%s' % (self.config('/passport/cache/prefix'), username))
                 self._commit_audit(audit, None, True)
-                self.write({"status": 200, "token": token})
+                self.write({"status": 200, "token": token, "user": user.dump(),
+                            "permissions": list(user.permissions(application))})
             else:
                 self._commit_audit(audit)
                 self.write({"status": 403, "msg": "dynamic password error"})
@@ -85,6 +86,15 @@ class LoginHandler(BaseHandler):
 
     def put(self, *args, **kwargs):
         self.post()
+
+    def head(self, *args, **kwargs):
+        user = self.get_current_user()
+        if user:
+            self.add_header("X-Passport-LoggedIn", "true")
+
+    def delete(self, *args, **kwargs):
+        token = self.get_argument('_token')
+        self.cache.delete('%s::token::%s' % (self.config('/passport/cache/prefix'), token))
 
 
 class QRHandler(BaseHandler):
@@ -112,7 +122,6 @@ class ProfileHandler(BaseHandler):
     @tornado.web.authenticated
     def put(self, *args, **kwargs):
         user = self.get_current_user()
-
         ret = {}
         try:
             args = json.loads(self.request.body)

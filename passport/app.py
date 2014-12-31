@@ -1,6 +1,7 @@
 import logging
 import etcd
 import redis
+import beanstalkt
 import tornado.web
 from .models import ad
 from .models import db
@@ -10,11 +11,13 @@ __author__ = 'comyn'
 
 
 class App(tornado.web.Application):
-    def __init__(self, handlers, **settings):
+    def __init__(self, name, handlers, **settings):
         self.config = etcd.Client(settings.get('etc_host', '127.0.0.1'), int(settings.get('etc_port', 4001)))
         self.cache = redis.from_url(self.config.read('/passport/cache/uri').value,
                                     max_connections=int(self.config.read('/passport/cache/pool_size').value))
+
         settings['login_url'] = "/login"
+        self.name = name
         super(App, self).__init__(handlers, **settings)
 
     def create_all(self):
@@ -42,7 +45,8 @@ class BaseHandler(tornado.web.RequestHandler):
     def config(self, key, default=None):
         try:
             return self.application.config.read(key).value
-        except Exception as e:
+        except:
+            logging.warn("no config found, use default")
             return default
 
     @property
@@ -58,3 +62,8 @@ class BaseHandler(tornado.web.RequestHandler):
         if token:
             uid = self.cache.get('%s::token::%s' % (self.config('/passport/cache/prefix'), token))
             return self.get_user(uid)
+
+    def options(self, *args, **kwargs):
+        self.add_header('Access-Control-Allow-Origin', '*')
+        self.add_header('Access-Control-Allow-Methods', '*')
+        self.add_header('Access-Control-Max-Age', 60)

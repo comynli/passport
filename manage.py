@@ -12,7 +12,7 @@ from passport.urls import HANDLERS
 __author__ = 'comyn'
 
 
-app = App(HANDLERS)
+app = App('passport', HANDLERS)
 instance = tornado.ioloop.IOLoop.instance()
 
 

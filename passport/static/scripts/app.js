@@ -26,18 +26,18 @@ passportApp.config(['$routeProvider',
 ]).
 run(['$rootScope', '$location', 'Auth', function ($rootScope, $location, Auth) {
     $rootScope.$on("$routeChangeStart", function (event, next) {
-        if (!Auth.isLogged()) {
-            // no logged user, redirect to /login
-            if (next.templateUrl === "template/login.html") {
-            } else {
-                $location.path("/login");
-            }
-        }
+        Auth.isLogged().then(
+            function(isLoggedIn){
+                if ((!isLoggedIn || next.templateUrl === "template/login.html")){
+                    $location.path("/login");
+                }
+            },
+            function(){}
+        );
     });
+
    $rootScope.logout = function(){
-       if(Auth.isLogged()){
-           Auth.logout();
-       }
+       Auth.logout();
        $location.path('/login');
    }
 }]);
