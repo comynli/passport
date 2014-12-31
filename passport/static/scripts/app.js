@@ -24,12 +24,13 @@ passportApp.config(['$routeProvider',
             })
     }
 ]).
-run(['$rootScope', '$location', 'Auth', function ($rootScope, $location, Auth) {
+run(['$rootScope', '$location', '$routeParams', 'Auth', function ($rootScope, $location, $routeParams, Auth) {
     $rootScope.$on("$routeChangeStart", function (event, next) {
+        sessionStorage.setItem('_next', $location.path());
         Auth.isLogged().then(
             function(isLoggedIn){
                 if ((!isLoggedIn || next.templateUrl === "template/login.html")){
-                    $location.path("/login");
+                    $location.url("/login");
                 }
             },
             function(){}

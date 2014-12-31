@@ -6,18 +6,30 @@ var passportControllers = angular.module('passportControllers', []);
 
 passportControllers.controller('LoginCtrl', ['$scope', '$http', '$location', 'Auth',
     function($scope, $http, $location, Auth){
+        var next = sessionStorage.getItem('_next');
+        sessionStorage.removeItem('_next');
+        console.log(next);
         $scope.login = function(){
             Auth.isLogged().then(
                 function(isLoggedIn){
                     if(isLoggedIn){
-                        $location.path("/")
+                        if(next && next != '/login'){
+                            $location.path(next);
+                        }else{
+                            $location.path("/")
+                        }
                     }else{
                         Auth.login($scope.username, $scope.password).then(
                             function(data){
                                 Auth.setToken(data.token);
                                 Auth.setPermissions(data.permissions);
                                 Auth.setUser(data.user);
-                                $location.path("/");
+                                if(next && next != '/login'){
+                                    $location.path(next);
+                                }else{
+                                    $location.path("/")
+                                }
+
                             },
                             function (msg) {
                                 $scope.error = msg;
@@ -29,7 +41,11 @@ passportControllers.controller('LoginCtrl', ['$scope', '$http', '$location', 'Au
                     Auth.login($scope.username, $scope.password).then(
                         function(token){
                             Auth.setToken(token);
-                            $location.path("/");
+                            if(next && next != '/login'){
+                                $location.path(next);
+                            }else{
+                                $location.path("/")
+                            }
                         },
                         function (msg) {
                             $scope.error = msg;
